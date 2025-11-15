@@ -7,6 +7,7 @@ type User struct {
 	Nickname string `gorm:"column:nickname"`
 	Role     string `gorm:"column:role"`
 	Token    string `gorm:"column:token"`
+	Chats    []Chat `gorm:"many2many:chat_users;"`
 }
 
 func (User) TableName() string { return "users" }

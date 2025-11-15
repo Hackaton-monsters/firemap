@@ -1,5 +1,9 @@
 package response
 
+type Markers struct {
+	Markers []*Marker `json:"markers"`
+}
+
 type Marker struct {
 	ID           int64    `json:"id"`
 	ChatID       int64    `json:"chatId"`
