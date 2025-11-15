@@ -22,6 +22,7 @@ type messageEvent struct {
 type Hub struct {
 	messageRepository contract.MessageRepository
 	userRepository    contract.UserRepository
+	chatRepository    contract.ChatRepository
 
 	register   chan *Client
 	unregister chan *Client
@@ -39,10 +40,12 @@ type Hub struct {
 func NewHub(
 	messageRepository contract.MessageRepository,
 	userRepository contract.UserRepository,
+	chatRepository contract.ChatRepository,
 ) *Hub {
 	return &Hub{
 		messageRepository: messageRepository,
 		userRepository:    userRepository,
+		chatRepository:    chatRepository,
 		register:          make(chan *Client),
 		unregister:        make(chan *Client),
 		subscribe:         make(chan subscription),
@@ -142,6 +145,10 @@ func (h *Hub) Unsubscribe(c *Client, chatID int64) {
 func (h *Hub) CreateAndBroadcastMessage(ctx context.Context, token string, command command.SendMessage) (*response.Message, error) {
 	user, err := h.userRepository.FindByToken(token)
 	if err != nil {
+		return nil, err
+	}
+
+	if _, err = h.chatRepository.GetById(command.ChatID); err != nil {
 		return nil, err
 	}
 
