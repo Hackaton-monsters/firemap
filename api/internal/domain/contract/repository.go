@@ -17,6 +17,7 @@ type UserRepository interface {
 type MessageRepository interface {
 	Add(message entity.Message) (entity.Message, error)
 	GetAll(chatID int64) ([]entity.Message, error)
+	GetById(messageID int64) (*entity.Message, error)
 }
 
 type MarkerRepository interface {

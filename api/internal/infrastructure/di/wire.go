@@ -7,6 +7,7 @@ import (
 	"firemap/internal/infrastructure/config"
 	"firemap/internal/infrastructure/db"
 	"firemap/internal/infrastructure/server"
+	"firemap/internal/infrastructure/translator"
 
 	"github.com/google/wire"
 )
@@ -22,6 +23,7 @@ func InitializeProcessManager() *ProcessManager {
 		db.NewDBForMigrations,
 		config.LoadFromEnvironment,
 		server.NewRoutes,
+		translator.NewClient,
 	)
 	return &ProcessManager{}
 }
