@@ -19,6 +19,7 @@ func NewRoutes(
 	registerHandler *handlers.Register,
 	authMeHandler *handlers.AuthMe,
 	createMarkerMeHandler *handlers.CreateMarker,
+	getMarkersMeHandler *handlers.GetMarkers,
 ) []Route {
 	return []Route{
 		{
@@ -44,6 +45,12 @@ func NewRoutes(
 			Method:  http.MethodPost,
 			Path:    "/marker",
 			Handler: createMarkerMeHandler.Handle,
+		},
+		{
+			Name:    "get_markers",
+			Method:  http.MethodGet,
+			Path:    "/marker/all",
+			Handler: getMarkersMeHandler.Handle,
 		},
 	}
 }

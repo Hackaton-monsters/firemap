@@ -32,3 +32,16 @@ func (r *markerRepository) Add(marker entity.Marker) (entity.Marker, error) {
 	}
 	return marker, nil
 }
+
+func (r *markerRepository) GetAll() ([]entity.Marker, error) {
+	var markers []entity.Marker
+
+	if err := r.db.
+		Preload("Chat").
+		Preload("Reports").
+		Find(&markers).Error; err != nil {
+		return nil, err
+	}
+
+	return markers, nil
+}

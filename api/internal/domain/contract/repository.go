@@ -20,6 +20,7 @@ type MessageRepository interface {
 
 type MarkerRepository interface {
 	Add(marker entity.Marker) (entity.Marker, error)
+	GetAll() ([]entity.Marker, error)
 }
 
 type ReportRepository interface {
