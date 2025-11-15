@@ -69,9 +69,9 @@ func (c *Client) readPump() {
 			if in.ChatID == 0 || in.Text == "" {
 				continue
 			}
-			if err := c.hub.HandleIncomingMessage(in.ChatID, in.Text); err != nil {
-				log.Println("HandleIncomingMessage:", err)
-			}
+			//if err := c.hub.HandleIncomingMessage(in.ChatID, in.Text); err != nil {
+			//	log.Println("HandleIncomingMessage:", err)
+			//}
 
 		case "history_request":
 			if in.ChatID == 0 {
@@ -80,9 +80,9 @@ func (c *Client) readPump() {
 			if in.Limit <= 0 {
 				in.Limit = 50
 			}
-			if err := c.hub.SendHistory(c, in.ChatID, in.Limit); err != nil {
-				log.Println("SendHistory:", err)
-			}
+			//if err := c.hub.SendHistory(c, in.ChatID, in.Limit); err != nil {
+			//	log.Println("SendHistory:", err)
+			//}
 		}
 	}
 }
