@@ -20,7 +20,7 @@ func NewChatRepository(
 }
 
 func (r *chatRepository) Add(chat entity.Chat) (entity.Chat, error) {
-	tx := r.db.Create(chat)
+	tx := r.db.Create(&chat)
 	if tx.Error != nil {
 		return chat, tx.Error
 	}

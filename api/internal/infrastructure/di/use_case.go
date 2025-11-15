@@ -10,4 +10,5 @@ var useCaseSet = wire.NewSet(
 	usecase.NewUserAuthenticator,
 	usecase.NewUserRegistrator,
 	usecase.NewUserGetter,
+	usecase.NewMarkerCreator,
 )

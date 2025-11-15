@@ -17,3 +17,11 @@ type UserRepository interface {
 type MessageRepository interface {
 	Add(message entity.Message) error
 }
+
+type MarkerRepository interface {
+	Add(marker entity.Marker) (entity.Marker, error)
+}
+
+type ReportRepository interface {
+	Add(report entity.Report) (entity.Report, error)
+}

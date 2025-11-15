@@ -16,6 +16,10 @@ server {
     gzip_proxied any;
     gzip_types text/css text/xml application/xml application/javascript application/xml+rss text/plain application/json;
 
+    location /img/ {
+        alias /usr/share/nginx/html/img/;
+    }
+
     location ~* ^/api/(.*)$ {
         limit_req zone=api_limit burst=20 nodelay;
 
