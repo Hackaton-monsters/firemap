@@ -1,6 +1,11 @@
 package server
 
-import "github.com/gin-gonic/gin"
+import (
+	"firemap/internal/infrastructure/server/handlers"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
 
 type Route struct {
 	Name    string
@@ -9,6 +14,22 @@ type Route struct {
 	Handler gin.HandlerFunc
 }
 
-func NewRoutes() []Route {
-	return []Route{}
+func NewRoutes(
+	authHandler *handlers.Auth,
+	signupHandler *handlers.Signup,
+) []Route {
+	return []Route{
+		{
+			Name:    "signup",
+			Method:  http.MethodPost,
+			Path:    "signup",
+			Handler: signupHandler.Handle,
+		},
+		{
+			Name:    "auth",
+			Method:  http.MethodGet,
+			Path:    "/auth/me",
+			Handler: authHandler.Handle,
+		},
+	}
 }

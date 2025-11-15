@@ -3,8 +3,8 @@
 
 CREATE TABLE chats
 (
-    id         INT AUTO_INCREMENT PRIMARY KEY COMMENT 'language identifier',
-    name       VARCHAR(1000) NOT NULL COMMENT 'language name',
+    id         INT AUTO_INCREMENT PRIMARY KEY COMMENT 'identifier',
+    name       VARCHAR(1000) NOT NULL COMMENT 'name',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'creation date',
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'update date'
 );

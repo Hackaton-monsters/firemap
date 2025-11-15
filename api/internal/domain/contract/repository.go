@@ -8,6 +8,11 @@ type ChatRepository interface {
 	GetAll() ([]entity.Chat, error)
 }
 
+type UserRepository interface {
+	Add(user entity.User) (entity.User, error)
+	FindByParams(params entity.User) (entity.User, error)
+}
+
 type MessageRepository interface {
 	Add(message entity.Message) error
 }

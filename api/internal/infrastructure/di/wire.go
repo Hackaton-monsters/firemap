@@ -14,7 +14,11 @@ import (
 func InitializeProcessManager() *ProcessManager {
 	wire.Build(
 		NewProcessManager,
-		//db.NewDB,
+		repositorySet,
+		serviceSet,
+		handlerSet,
+		useCaseSet,
+		db.NewDB,
 		db.NewDBForMigrations,
 		config.LoadFromEnvironment,
 		server.NewRoutes,

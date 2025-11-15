@@ -7,9 +7,13 @@
 package di
 
 import (
+	"firemap/internal/application/service"
+	"firemap/internal/application/usecase"
 	"firemap/internal/infrastructure/config"
 	"firemap/internal/infrastructure/db"
+	"firemap/internal/infrastructure/repository"
 	"firemap/internal/infrastructure/server"
+	"firemap/internal/infrastructure/server/handlers"
 )
 
 // Injectors from wire.go:
@@ -17,7 +21,14 @@ import (
 func InitializeProcessManager() *ProcessManager {
 	configConfig := config.LoadFromEnvironment()
 	sqlDB := db.NewDBForMigrations(configConfig)
-	v := server.NewRoutes()
+	gormDB := db.NewDB(configConfig)
+	userRepository := repository.NewUserRepository(gormDB)
+	userService := service.NewUserService(userRepository)
+	userAuthenticator := usecase.NewUserAuthenticator(userService)
+	auth := handlers.NewAuth(userAuthenticator)
+	userRegistrator := usecase.NewUserRegistrator(userService)
+	signup := handlers.NewASignup(userRegistrator)
+	v := server.NewRoutes(auth, signup)
 	processManager := NewProcessManager(configConfig, sqlDB, v)
 	return processManager
 }
