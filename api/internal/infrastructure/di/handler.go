@@ -9,4 +9,5 @@ import (
 var handlerSet = wire.NewSet(
 	handlers.NewLogin,
 	handlers.NewRegister,
+	handlers.NewAuthMe,
 )

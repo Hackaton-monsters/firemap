@@ -50,3 +50,19 @@ func (r *userRepository) FindByParams(params entity.User) (entity.User, error) {
 
 	return user, nil
 }
+
+func (r *userRepository) FindByToken(token string) (entity.User, error) {
+	var user entity.User
+	err := r.db.
+		Where("users.token = ?", token).
+		First(&user).Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return user, service.ErrUserNotFound
+		}
+		return user, err
+	}
+
+	return user, nil
+}

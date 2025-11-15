@@ -28,7 +28,9 @@ func InitializeProcessManager() *ProcessManager {
 	login := handlers.NewLogin(userAuthenticator)
 	userRegistrator := usecase.NewUserRegistrator(userService)
 	register := handlers.NewRegister(userRegistrator)
-	v := server.NewRoutes(login, register)
+	userGetter := usecase.NewUserGetter(userService)
+	authMe := handlers.NewAuthMe(userGetter)
+	v := server.NewRoutes(login, register, authMe)
 	processManager := NewProcessManager(configConfig, sqlDB, v)
 	return processManager
 }

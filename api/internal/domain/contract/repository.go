@@ -11,6 +11,7 @@ type ChatRepository interface {
 type UserRepository interface {
 	Add(user entity.User) (entity.User, error)
 	FindByParams(params entity.User) (entity.User, error)
+	FindByToken(token string) (entity.User, error)
 }
 
 type MessageRepository interface {

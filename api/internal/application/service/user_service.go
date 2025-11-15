@@ -15,6 +15,7 @@ var ErrUserNotFound = errors.New("user not found")
 type UserService interface {
 	Add(user command.RegisterUser) (entity.User, error)
 	FindByParams(user command.AuthenticateUser) (entity.User, error)
+	FindByToken(token string) (entity.User, error)
 }
 
 type userService struct {
@@ -42,6 +43,10 @@ func (s *userService) FindByParams(user command.AuthenticateUser) (entity.User, 
 		Email:    user.Email,
 		Password: user.Password,
 	})
+}
+
+func (s *userService) FindByToken(token string) (entity.User, error) {
+	return s.repository.FindByToken(token)
 }
 
 func RandomToken32() string {
