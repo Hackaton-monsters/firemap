@@ -11,9 +11,22 @@ services:
       MYSQL_USER: ${DB_USER}
       MYSQL_PASSWORD: ${DB_PASSWORD}
     volumes:
-      - blogdb_data:/var/lib/mysql
+      - db_data:/var/lib/mysql
     ports:
       - "3306:3306"
+
+  migrations:
+    container_name: firemap_migrations
+    build:
+        context: .
+        dockerfile: ./api/Dockerfile
+    command: "migrate"
+    environment:
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
 
 volumes:
   db_data:
