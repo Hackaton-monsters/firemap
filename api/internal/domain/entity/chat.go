@@ -6,7 +6,8 @@ type Chat struct {
 	ID        int64     `gorm:"column:id"`
 	CreatedAt time.Time `gorm:"column:created_at"`
 	UpdatedAt time.Time `gorm:"column:updated_at"`
-	Messages  []Message `gorm:"foreignKey:ChatID;references:ID"`
+	Messages  []Message
+	Users     []User `gorm:"many2many:chat_users;"`
 }
 
 type Message struct {
@@ -17,6 +18,7 @@ type Message struct {
 	CreatedAt time.Time `gorm:"column:created_at"`
 	UpdatedAt time.Time `gorm:"column:updated_at"`
 	User      User
+	Chat      Chat
 }
 
 func (Chat) TableName() string    { return "chats" }

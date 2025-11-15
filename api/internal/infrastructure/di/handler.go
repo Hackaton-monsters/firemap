@@ -12,4 +12,5 @@ var handlerSet = wire.NewSet(
 	handlers.NewAuthMe,
 	handlers.NewCreateMarker,
 	handlers.NewGetMarkers,
+	handlers.NewGetChatHistory,
 )

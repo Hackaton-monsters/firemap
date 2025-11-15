@@ -35,12 +35,15 @@ func InitializeProcessManager() *ProcessManager {
 	reportRepository := repository.NewReportRepository(gormDB)
 	reportService := service.NewReportService(reportRepository)
 	chatRepository := repository.NewChatRepository(gormDB)
-	chatService := service.NewChatService(chatRepository)
+	messageRepository := repository.NewMessagesRepository(gormDB)
+	chatService := service.NewChatService(chatRepository, messageRepository)
 	markerCreator := usecase.NewMarkerCreator(userService, markerService, reportService, chatService)
 	createMarker := handlers.NewCreateMarker(markerCreator)
 	markerGetter := usecase.NewMarkersGetter(userService, markerService)
 	getMarkers := handlers.NewGetMarkers(markerGetter)
-	v := server.NewRoutes(login, register, authMe, createMarker, getMarkers)
+	chatHistoryGetter := usecase.NewChatHistoryGetter(userService, markerService, chatService)
+	getChatHistory := handlers.NewGetChatHistory(chatHistoryGetter)
+	v := server.NewRoutes(login, register, authMe, createMarker, getMarkers, getChatHistory)
 	processManager := NewProcessManager(configConfig, sqlDB, v)
 	return processManager
 }

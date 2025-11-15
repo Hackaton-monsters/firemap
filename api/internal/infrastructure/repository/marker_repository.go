@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"errors"
+	"firemap/internal/application/service"
 	"firemap/internal/domain/contract"
 	"firemap/internal/domain/entity"
 
@@ -44,4 +46,22 @@ func (r *markerRepository) GetAll() ([]entity.Marker, error) {
 	}
 
 	return markers, nil
+}
+
+func (r *markerRepository) GetByChatID(chatId int64) (entity.Marker, error) {
+	var marker entity.Marker
+
+	err := r.db.
+		Preload("Chat.Messages").
+		Preload("Chat.Messages.User").
+		Where("chat_id = ?", chatId).
+		First(&marker).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return marker, service.ErrChatNotFound
+		}
+		return marker, err
+	}
+
+	return marker, nil
 }

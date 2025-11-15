@@ -10,6 +10,7 @@ import (
 type MarkerService interface {
 	Create(marker command.CreateMarker, chatID int64) (entity.Marker, error)
 	GetAll() ([]entity.Marker, error)
+	GetByChatId(chatID int64) (entity.Marker, error)
 }
 
 type markerService struct {
@@ -34,4 +35,8 @@ func (s *markerService) Create(marker command.CreateMarker, chatID int64) (entit
 
 func (s *markerService) GetAll() ([]entity.Marker, error) {
 	return s.repository.GetAll()
+}
+
+func (s *markerService) GetByChatId(chatID int64) (entity.Marker, error) {
+	return s.repository.GetByChatID(chatID)
 }

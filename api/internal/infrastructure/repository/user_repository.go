@@ -37,6 +37,7 @@ func (r *userRepository) Add(user entity.User) (entity.User, error) {
 func (r *userRepository) FindByParams(params entity.User) (entity.User, error) {
 	var user entity.User
 	err := r.db.
+		Preload("Chats").
 		Where("users.email = ?", params.Email).
 		Where("users.password = ?", params.Password).
 		First(&user).Error
@@ -54,6 +55,7 @@ func (r *userRepository) FindByParams(params entity.User) (entity.User, error) {
 func (r *userRepository) FindByToken(token string) (entity.User, error) {
 	var user entity.User
 	err := r.db.
+		Preload("Chats").
 		Where("users.token = ?", token).
 		First(&user).Error
 
