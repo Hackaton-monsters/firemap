@@ -9,11 +9,13 @@ package di
 import (
 	"firemap/internal/application/service"
 	"firemap/internal/application/usecase"
+	"firemap/internal/infrastructure/chat"
 	"firemap/internal/infrastructure/config"
 	"firemap/internal/infrastructure/db"
 	"firemap/internal/infrastructure/repository"
 	"firemap/internal/infrastructure/server"
 	"firemap/internal/infrastructure/server/handlers"
+	"github.com/google/wire"
 )
 
 // Injectors from wire.go:
@@ -43,7 +45,13 @@ func InitializeProcessManager() *ProcessManager {
 	getMarkers := handlers.NewGetMarkers(markerGetter)
 	chatHistoryGetter := usecase.NewChatHistoryGetter(userService, markerService, chatService)
 	getChatHistory := handlers.NewGetChatHistory(chatHistoryGetter)
-	v := server.NewRoutes(login, register, authMe, createMarker, getMarkers, getChatHistory)
-	processManager := NewProcessManager(configConfig, sqlDB, v)
+	hub := chat.NewHub(messageRepository, userRepository)
+	sendMessage := handlers.NewSendMessage(hub)
+	v := server.NewRoutes(login, register, authMe, createMarker, getMarkers, getChatHistory, sendMessage)
+	processManager := NewProcessManager(configConfig, sqlDB, v, hub)
 	return processManager
 }
+
+// wire.go:
+
+var chatSet = wire.NewSet(chat.NewHub)

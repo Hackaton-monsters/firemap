@@ -21,6 +21,7 @@ func NewRoutes(
 	createMarkerMeHandler *handlers.CreateMarker,
 	getMarkersMeHandler *handlers.GetMarkers,
 	getChatHistoryHandler *handlers.GetChatHistory,
+	sendMessageHandler *handlers.SendMessage,
 ) []Route {
 	return []Route{
 		{
@@ -58,6 +59,12 @@ func NewRoutes(
 			Method:  http.MethodGet,
 			Path:    "/chat/:id/history",
 			Handler: getChatHistoryHandler.Handle,
+		},
+		{
+			Name:    "send_message",
+			Method:  http.MethodPost,
+			Path:    "/message",
+			Handler: sendMessageHandler.Handle,
 		},
 	}
 }
