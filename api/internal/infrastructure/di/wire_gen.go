@@ -14,6 +14,7 @@ import (
 	"firemap/internal/infrastructure/repository"
 	"firemap/internal/infrastructure/server"
 	"firemap/internal/infrastructure/server/handlers"
+	"firemap/internal/infrastructure/translator"
 )
 
 // Injectors from wire.go:
@@ -43,7 +44,9 @@ func InitializeProcessManager() *ProcessManager {
 	getMarkers := handlers.NewGetMarkers(markerGetter)
 	chatHistoryGetter := usecase.NewChatHistoryGetter(userService, markerService, chatService)
 	getChatHistory := handlers.NewGetChatHistory(chatHistoryGetter)
-	v := server.NewRoutes(login, register, authMe, createMarker, getMarkers, getChatHistory)
+	translatorTranslator := translator.NewClient(configConfig)
+	translateMessage := handlers.NewTranslateMessage(messageRepository, translatorTranslator)
+	v := server.NewRoutes(login, register, authMe, createMarker, getMarkers, getChatHistory, translateMessage)
 	processManager := NewProcessManager(configConfig, sqlDB, v)
 	return processManager
 }
