@@ -1,0 +1,30 @@
+server {
+    listen 8080;
+
+    access_log on;
+    error_log /dev/stderr;
+
+    keepalive_timeout 65;
+
+    gzip on;
+    gzip_static on;
+    gzip_comp_level 6;
+    gzip_min_length 4096;
+    gzip_buffers 16 8k;
+    gzip_http_version 1.1;
+    gzip_vary on;
+    gzip_proxied any;
+    gzip_types text/css text/xml application/xml application/javascript application/xml+rss text/plain application/json;
+
+    location ~* ^/api/(.*)$ {
+        limit_req zone=api_limit burst=20 nodelay;
+
+        rewrite ^/api(.*)$ $1 break;
+        proxy_pass ${API_HOST};
+
+        proxy_cache api_cache;
+        proxy_cache_methods GET HEAD;
+        proxy_cache_valid 200 201 202 203 204 205 206 207 208 226 1m;
+        add_header X-Cache-Status $upstream_cache_status;
+    }
+}
