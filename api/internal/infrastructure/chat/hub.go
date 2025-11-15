@@ -153,7 +153,7 @@ func (h *Hub) Unsubscribe(c *Client, chatID int64) {
 //	}
 //	return nil
 //}
-//
+
 //// История по запросу клиента (по WS)
 //func (h *Hub) SendHistory(c *Client, chatID int64, limit int) error {
 //	msgs, err := h.repository.GetMessages(context.Background(), chatID, limit)
