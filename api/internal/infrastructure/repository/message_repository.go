@@ -46,3 +46,12 @@ func (r *messagesRepository) GetAll(chatID int64) ([]entity.Message, error) {
 
 	return messages, nil
 }
+
+func (r *messagesRepository) GetById(messageID int64) (*entity.Message, error) {
+	var message entity.Message
+	if err := r.db.First(&message, messageID).Error; err != nil {
+		return nil, err
+	}
+
+	return &message, nil
+}
