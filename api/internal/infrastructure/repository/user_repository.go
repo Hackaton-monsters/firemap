@@ -37,8 +37,16 @@ func (r *userRepository) Add(user entity.User) (entity.User, error) {
 func (r *userRepository) FindByParams(params entity.User) (entity.User, error) {
 	var user entity.User
 	err := r.db.
-		Where("Users.email = ?", params.Email).
-		Where("Users.password = ?", params.Password).
+		Where("users.email = ?", params.Email).
+		Where("users.password = ?", params.Password).
 		First(&user).Error
-	return user, err
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return user, service.ErrUserNotFound
+		}
+		return user, err
+	}
+
+	return user, nil
 }

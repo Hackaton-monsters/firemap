@@ -8,27 +8,27 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type Auth struct {
-	useCase contract.UserAuthenticator
+type Register struct {
+	useCase contract.UserRegistrator
 }
 
-func NewAuth(
-	useCase contract.UserAuthenticator,
-) *Auth {
-	return &Auth{
+func NewRegister(
+	useCase contract.UserRegistrator,
+) *Register {
+	return &Register{
 		useCase: useCase,
 	}
 }
 
-func (h *Auth) Handle(c *gin.Context) {
-	var request *command.AuthenticateUser
+func (h *Register) Handle(c *gin.Context) {
+	var request *command.RegisterUser
 
 	if err := c.ShouldBindJSON(&request); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	response, err := h.useCase.AuthenticateUser(request)
+	response, err := h.useCase.RegisterUser(request)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

@@ -10,6 +10,7 @@ import (
 )
 
 var ErrUserAlreadyExists = errors.New("user already exists")
+var ErrUserNotFound = errors.New("user not found")
 
 type UserService interface {
 	Add(user command.RegisterUser) (entity.User, error)

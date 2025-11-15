@@ -15,21 +15,21 @@ type Route struct {
 }
 
 func NewRoutes(
-	authHandler *handlers.Auth,
-	signupHandler *handlers.Signup,
+	loginHandler *handlers.Login,
+	registerHandler *handlers.Register,
 ) []Route {
 	return []Route{
 		{
-			Name:    "signup",
+			Name:    "register",
 			Method:  http.MethodPost,
-			Path:    "signup",
-			Handler: signupHandler.Handle,
+			Path:    "/register",
+			Handler: registerHandler.Handle,
 		},
 		{
-			Name:    "auth",
-			Method:  http.MethodGet,
-			Path:    "/auth/me",
-			Handler: authHandler.Handle,
+			Name:    "login",
+			Method:  http.MethodPost,
+			Path:    "/login",
+			Handler: loginHandler.Handle,
 		},
 	}
 }

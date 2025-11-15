@@ -7,6 +7,6 @@ import (
 )
 
 var handlerSet = wire.NewSet(
-	handlers.NewAuth,
-	handlers.NewASignup,
+	handlers.NewLogin,
+	handlers.NewRegister,
 )
