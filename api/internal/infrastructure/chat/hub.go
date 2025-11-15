@@ -142,7 +142,7 @@ func (h *Hub) Unsubscribe(c *Client, chatID int64) {
 	h.unsubscribe <- subscription{client: c, chatID: chatID}
 }
 
-func (h *Hub) CreateAndBroadcastMessage(ctx context.Context, token string, command command.SendMessage) (*response.Message, error) {
+func (h *Hub) CreateAndBroadcastMessage(ctx context.Context, token string, command command.SendMessage) (*response.CreatedMessage, error) {
 	user, err := h.userRepository.FindByToken(token)
 	if err != nil {
 		return nil, err
@@ -191,7 +191,9 @@ func (h *Hub) CreateAndBroadcastMessage(ctx context.Context, token string, comma
 		data:   payload,
 	}
 
-	return &messageResponse, nil
+	return &response.CreatedMessage{
+		Message: messageResponse,
+	}, nil
 }
 
 //func (h *Hub) HandleIncomingMessage(chatID int64, text string) error {

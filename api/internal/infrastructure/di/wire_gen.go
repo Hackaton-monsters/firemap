@@ -47,7 +47,11 @@ func InitializeProcessManager() *ProcessManager {
 	getChatHistory := handlers.NewGetChatHistory(chatHistoryGetter)
 	hub := chat.NewHub(messageRepository, userRepository, chatRepository)
 	sendMessage := handlers.NewSendMessage(hub)
-	v := server.NewRoutes(login, register, authMe, createMarker, getMarkers, getChatHistory, sendMessage)
+	chatUserRepository := repository.NewChatUserRepository(gormDB)
+	chatUserService := service.NewChatUserService(chatUserRepository)
+	chatConnector := usecase.NewChatConnector(userService, chatService, markerService, chatUserService)
+	connectToChat := handlers.NewConnectToChat(chatConnector)
+	v := server.NewRoutes(login, register, authMe, createMarker, getMarkers, getChatHistory, sendMessage, connectToChat)
 	processManager := NewProcessManager(configConfig, sqlDB, v, hub)
 	return processManager
 }

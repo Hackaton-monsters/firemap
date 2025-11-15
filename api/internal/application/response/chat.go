@@ -2,6 +2,10 @@ package response
 
 import "time"
 
+type CreatedMessage struct {
+	Message Message `json:"message"`
+}
+
 type Message struct {
 	ID        int64     `json:"id"`
 	Text      string    `json:"text"`
