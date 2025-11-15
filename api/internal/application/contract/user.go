@@ -12,3 +12,7 @@ type UserRegistrator interface {
 type UserAuthenticator interface {
 	AuthenticateUser(command *command.AuthenticateUser) (*response.LoginUser, error)
 }
+
+type UserGetter interface {
+	GetUser(token string) (*response.User, error)
+}

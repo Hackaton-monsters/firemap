@@ -8,4 +8,7 @@ import (
 
 var serviceSet = wire.NewSet(
 	service.NewUserService,
+	service.NewMarkerService,
+	service.NewReportService,
+	service.NewChatService,
 )

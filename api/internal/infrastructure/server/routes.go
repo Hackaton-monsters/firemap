@@ -17,6 +17,8 @@ type Route struct {
 func NewRoutes(
 	loginHandler *handlers.Login,
 	registerHandler *handlers.Register,
+	authMeHandler *handlers.AuthMe,
+	createMarkerMeHandler *handlers.CreateMarker,
 ) []Route {
 	return []Route{
 		{
@@ -30,6 +32,18 @@ func NewRoutes(
 			Method:  http.MethodPost,
 			Path:    "/login",
 			Handler: loginHandler.Handle,
+		},
+		{
+			Name:    "auth_me",
+			Method:  http.MethodGet,
+			Path:    "/auth/me",
+			Handler: authMeHandler.Handle,
+		},
+		{
+			Name:    "create_marker",
+			Method:  http.MethodPost,
+			Path:    "/marker",
+			Handler: createMarkerMeHandler.Handle,
 		},
 	}
 }
