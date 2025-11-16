@@ -32,7 +32,7 @@ func (u *markersGetter) GetMarkers(token string) (*response.Markers, error) {
 
 	markers, _ := u.markerService.GetAll()
 
-	var markersResponse []*response.MapMarker
+	var markersResponse = make([]*response.MapMarker, 0)
 	for _, marker := range markers {
 		reportsResponse := make([]response.Report, 0)
 		for _, report := range marker.Reports {

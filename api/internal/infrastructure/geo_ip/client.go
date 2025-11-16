@@ -121,5 +121,39 @@ func (c *Client) GetDisplayNameByCoordinate(ctx context.Context, lat, lon float6
 		return "", fmt.Errorf("decode json: %w", err)
 	}
 
-	return liq.Address.City, nil
+	addr := Address{
+		DisplayName: liq.DisplayName,
+		Street:      liq.Address.Road,
+		HouseNumber: liq.Address.HouseNumber,
+		District:    firstNonEmpty(liq.Address.Suburb),
+		City:        firstNonEmpty(liq.Address.City, liq.Address.Town, liq.Address.Village),
+		State:       liq.Address.State,
+		Postcode:    liq.Address.Postcode,
+		Country:     liq.Address.Country,
+		CountryCode: liq.Address.CountryCode,
+	}
+
+	fmt.Println(addr.HouseNumber)
+	fmt.Println(addr.HouseNumber)
+	fmt.Println(addr.HouseNumber)
+	fmt.Println(addr.HouseNumber)
+	fmt.Println(addr.City)
+	fmt.Println(addr.City)
+	fmt.Println(addr.City)
+	fmt.Println(addr.City)
+	fmt.Println(addr.City)
+	fmt.Println(addr.City)
+	fmt.Println(addr.City)
+	fmt.Println(addr.City)
+
+	return addr.City, nil
+}
+
+func firstNonEmpty(vals ...string) string {
+	for _, v := range vals {
+		if v != "" {
+			return v
+		}
+	}
+	return ""
 }
