@@ -80,7 +80,7 @@ func NewRoutes(
 		{
 			Name:    "delete_chat",
 			Method:  http.MethodDelete,
-			Path:    "/chat/:id/delete",
+			Path:    "/chat/:id",
 			Handler: deleteChatHandler.Handle,
 		},
 		{
