@@ -115,11 +115,16 @@ func (u *markerCreator) CreateMarker(token string, cmd *command.CreateMarker) (*
 	}
 
 	title, err := u.infoGetter.GetDisplayNameByCoordinate(context.TODO(), cmd.Lat, cmd.Lon)
-	if err != nil {
-		fmt.Println(err)
+	fmt.Println(title)
+	fmt.Println(title)
+	fmt.Println(title)
+	fmt.Println(err)
+	fmt.Println(err)
+	fmt.Println(err)
+	fmt.Println(err)
+	if err != nil || title == "" {
 		title = fmt.Sprintf("%f %f", cmd.Lat, cmd.Lon)
 	}
-	title = fmt.Sprintf("%s - %s", cmd.Type, title)
 
 	marker, err := u.markerService.Create(*cmd, chat.ID, title)
 	if err != nil {
