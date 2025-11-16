@@ -14,6 +14,7 @@ var handlerSet = wire.NewSet(
 	handlers.NewGetMarkers,
 	handlers.NewGetChatHistory,
 	handlers.NewTranslateMessage,
+	handlers.NewUploadImage,
 	handlers.NewSendMessage,
 	handlers.NewConnectToChat,
 	handlers.NewGetAllChats,

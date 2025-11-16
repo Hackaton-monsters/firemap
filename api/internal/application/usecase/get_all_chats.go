@@ -10,17 +10,20 @@ type chatGetter struct {
 	userService   service.UserService
 	markerService service.MarkerService
 	chatService   service.ChatService
+	imageService  service.ImageService
 }
 
 func NewChatGetter(
 	userService service.UserService,
 	markerService service.MarkerService,
 	chatService service.ChatService,
+	imageService service.ImageService,
 ) contract.ChatGetter {
 	return &chatGetter{
 		userService:   userService,
 		markerService: markerService,
 		chatService:   chatService,
+		imageService:  imageService,
 	}
 }
 
@@ -59,10 +62,19 @@ func (u *chatGetter) GetAllChats(token string) (*response.Chats, error) {
 
 		reportsResponse := make([]response.Report, 0)
 		for _, report := range marker.Reports {
+			photoURLs := make([]string, 0, len(report.Photos))
+			for _, photoID := range report.Photos {
+				image, err := u.imageService.GetByID(photoID)
+				if err != nil {
+					continue
+				}
+				photoURLs = append(photoURLs, image.URL)
+			}
+
 			reportsResponse = append(reportsResponse, response.Report{
 				ID:      report.ID,
 				Comment: report.Comment,
-				Photos:  report.Photos,
+				Photos:  photoURLs,
 			})
 		}
 
