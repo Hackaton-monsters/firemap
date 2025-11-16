@@ -27,7 +27,7 @@ type Marker struct {
 }
 
 type Report struct {
-	ID      int64   `json:"id"`
-	Comment string  `json:"comment"`
-	Photos  []int64 `json:"photos"`
+	ID      int64    `json:"id"`
+	Comment string   `json:"comment"`
+	Photos  []string `json:"photos"`
 }

@@ -24,6 +24,7 @@ func NewRoutes(
 	sendMessageHandler *handlers.SendMessage,
 	connectToChatHandler *handlers.ConnectToChat,
 	translateMessageHandler *handlers.TranslateMessage,
+	uploadImageHandler *handlers.UploadImage,
 	getAllChatsHandler *handlers.GetAllChats,
 ) []Route {
 	return []Route{
@@ -86,6 +87,12 @@ func NewRoutes(
 			Method:  http.MethodGet,
 			Path:    "/message/:id/translate/",
 			Handler: translateMessageHandler.Handle,
+		},
+		{
+			Name:    "upload_image",
+			Method:  http.MethodPost,
+			Path:    "/image/upload",
+			Handler: uploadImageHandler.Handle,
 		},
 	}
 }

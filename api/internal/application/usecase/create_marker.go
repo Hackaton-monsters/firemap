@@ -13,6 +13,7 @@ type markerCreator struct {
 	reportService   service.ReportService
 	chatService     service.ChatService
 	chatUserService service.ChatUserService
+	imageService    service.ImageService
 }
 
 func NewMarkerCreator(
@@ -21,6 +22,7 @@ func NewMarkerCreator(
 	reportService service.ReportService,
 	chatService service.ChatService,
 	chatUserService service.ChatUserService,
+	imageService service.ImageService,
 ) contract.MarkerCreator {
 	return &markerCreator{
 		userService:     userService,
@@ -28,6 +30,7 @@ func NewMarkerCreator(
 		reportService:   reportService,
 		chatService:     chatService,
 		chatUserService: chatUserService,
+		imageService:    imageService,
 	}
 }
 
@@ -57,7 +60,16 @@ func (u *markerCreator) CreateMarker(token string, command *command.CreateMarker
 		return nil, err
 	}
 
-	markerResponse := response.Marker{
+	photoURLs := make([]string, 0, len(report.Photos))
+	for _, photoID := range report.Photos {
+		image, err := u.imageService.GetByID(photoID)
+		if err != nil {
+			continue
+		}
+		photoURLs = append(photoURLs, image.URL)
+	}
+
+	markerResponse := &response.Marker{
 		ID:     marker.ID,
 		ChatID: marker.ChatID,
 		Lat:    marker.Lat,
@@ -65,7 +77,7 @@ func (u *markerCreator) CreateMarker(token string, command *command.CreateMarker
 		Reports: []response.Report{{
 			ID:      report.ID,
 			Comment: report.Comment,
-			Photos:  report.Photos,
+			Photos:  photoURLs,
 		}},
 		ReportsCount: 1,
 		Type:         marker.Type,
@@ -73,7 +85,7 @@ func (u *markerCreator) CreateMarker(token string, command *command.CreateMarker
 	}
 
 	return &response.CreatedMarker{
-		Marker:   markerResponse,
+		Marker:   *markerResponse,
 		IsNew:    true,
 		IsMember: true,
 	}, nil

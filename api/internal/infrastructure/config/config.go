@@ -15,10 +15,15 @@ type Config struct {
 	ConnMaxLifetime int        `envconfig:"db_pool_conn_lifetime" default:"10"`
 	HttpServerPort  int        `envconfig:"HTTP_SERVER_PORT" default:"8081"`
 	Translator      Translator `envconfig:"translator"`
+	S3              S3         `envconfig:"s3"`
 }
 
 type Translator struct {
 	URL string `envconfig:"TRANSLATOR_URL"   default:"https://translate.googleapis.com/translate_a/single"`
+}
+
+type S3 struct {
+	URL string `envconfig:"CLOUDINARY_URL"`
 }
 
 func LoadFromEnvironment() *Config {

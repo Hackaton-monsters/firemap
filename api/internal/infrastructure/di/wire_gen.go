@@ -13,6 +13,7 @@ import (
 	"firemap/internal/infrastructure/config"
 	"firemap/internal/infrastructure/db"
 	"firemap/internal/infrastructure/repository"
+	"firemap/internal/infrastructure/s3"
 	"firemap/internal/infrastructure/server"
 	"firemap/internal/infrastructure/server/handlers"
 	"firemap/internal/infrastructure/translator"
@@ -42,9 +43,12 @@ func InitializeProcessManager() *ProcessManager {
 	chatService := service.NewChatService(chatRepository, messageRepository)
 	chatUserRepository := repository.NewChatUserRepository(gormDB)
 	chatUserService := service.NewChatUserService(chatUserRepository)
-	markerCreator := usecase.NewMarkerCreator(userService, markerService, reportService, chatService, chatUserService)
+	cloudinaryClient := s3.ProvideS3Client(configConfig)
+	imageRepository := repository.NewImageRepository(gormDB, cloudinaryClient, configConfig)
+	imageService := service.NewImageService(imageRepository)
+	markerCreator := usecase.NewMarkerCreator(userService, markerService, reportService, chatService, chatUserService, imageService)
 	createMarker := handlers.NewCreateMarker(markerCreator)
-	markerGetter := usecase.NewMarkersGetter(userService, markerService)
+	markerGetter := usecase.NewMarkersGetter(userService, markerService, imageService)
 	getMarkers := handlers.NewGetMarkers(markerGetter)
 	chatHistoryGetter := usecase.NewChatHistoryGetter(userService, markerService, chatService)
 	getChatHistory := handlers.NewGetChatHistory(chatHistoryGetter)
@@ -54,9 +58,11 @@ func InitializeProcessManager() *ProcessManager {
 	connectToChat := handlers.NewConnectToChat(chatConnector)
 	translatorTranslator := translator.NewClient(configConfig)
 	translateMessage := handlers.NewTranslateMessage(messageRepository, translatorTranslator)
-	chatGetter := usecase.NewChatGetter(userService, markerService, chatService)
+	imageUploader := usecase.NewImageUploader(imageService, userService)
+	uploadImage := handlers.NewUploadImage(imageUploader)
+	chatGetter := usecase.NewChatGetter(userService, markerService, chatService, imageService)
 	getAllChats := handlers.NewGetAllChats(chatGetter)
-	v := server.NewRoutes(login, register, authMe, createMarker, getMarkers, getChatHistory, sendMessage, connectToChat, translateMessage, getAllChats)
+	v := server.NewRoutes(login, register, authMe, createMarker, getMarkers, getChatHistory, sendMessage, connectToChat, translateMessage, uploadImage, getAllChats)
 	processManager := NewProcessManager(configConfig, sqlDB, v, hub)
 	return processManager
 }
