@@ -175,12 +175,17 @@ func (h *Hub) CreateAndBroadcastMessage(ctx context.Context, token string, comma
 		CreatedAt: message.CreatedAt,
 	}
 
+	createdMessageResponse := response.CreatedMessage{
+		ChatID:  command.ChatID,
+		Message: messageResponse,
+	}
+
 	payload, err := json.Marshal(struct {
-		Type    string           `json:"type"`
-		Payload response.Message `json:"payload"`
+		Type    string                  `json:"type"`
+		Payload response.CreatedMessage `json:"payload"`
 	}{
 		Type:    "message",
-		Payload: messageResponse,
+		Payload: createdMessageResponse,
 	})
 	if err != nil {
 		return nil, err
@@ -191,9 +196,7 @@ func (h *Hub) CreateAndBroadcastMessage(ctx context.Context, token string, comma
 		data:   payload,
 	}
 
-	return &response.CreatedMessage{
-		Message: messageResponse,
-	}, nil
+	return &createdMessageResponse, nil
 }
 
 //func (h *Hub) HandleIncomingMessage(chatID int64, text string) error {

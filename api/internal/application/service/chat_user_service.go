@@ -7,9 +7,11 @@ import (
 )
 
 var ErrUserAlreadyPresentInChat = errors.New("user already present in chat")
+var ErrUserNotPresentInChat = errors.New("user not present in chat")
 
 type ChatUserService interface {
 	Connect(userID int64, chatID int64) (entity.ChatUser, error)
+	Delete(userID int64, chatID int64) error
 }
 
 type chatUserService struct {
@@ -29,4 +31,8 @@ func (s *chatUserService) Connect(userID int64, chatID int64) (entity.ChatUser, 
 		UserID: userID,
 		ChatID: chatID,
 	})
+}
+
+func (s *chatUserService) Delete(userID int64, chatID int64) error {
+	return s.chatUserRepository.DeleteByID(userID, chatID)
 }

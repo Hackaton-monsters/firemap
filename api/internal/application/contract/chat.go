@@ -15,3 +15,7 @@ type ChatConnector interface {
 type ChatGetter interface {
 	GetAllChats(token string) (*response.Chats, error)
 }
+
+type ChatDeleter interface {
+	DeleteChat(token string, chatID int64) error
+}

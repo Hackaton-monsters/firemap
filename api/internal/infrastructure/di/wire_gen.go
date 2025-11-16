@@ -57,7 +57,9 @@ func InitializeProcessManager() *ProcessManager {
 	chatGetter := usecase.NewChatGetter(userService, markerService, chatService)
 	getAllChats := handlers.NewGetAllChats(chatGetter)
 	ws := handlers.NewWS(hub)
-	v := server.NewRoutes(login, register, authMe, createMarker, getMarkers, getChatHistory, sendMessage, connectToChat, translateMessage, getAllChats, ws)
+	chatDeleter := usecase.NewChatDeleter(userService, chatUserService)
+	deleteChat := handlers.NewDeleteChat(chatDeleter)
+	v := server.NewRoutes(login, register, authMe, createMarker, getMarkers, getChatHistory, sendMessage, connectToChat, translateMessage, getAllChats, ws, deleteChat)
 	processManager := NewProcessManager(configConfig, sqlDB, v, hub)
 	return processManager
 }
