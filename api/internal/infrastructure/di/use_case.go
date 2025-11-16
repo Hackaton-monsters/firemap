@@ -16,4 +16,5 @@ var useCaseSet = wire.NewSet(
 	usecase.NewImageUploader,
 	usecase.NewChatConnector,
 	usecase.NewChatGetter,
+	usecase.NewChatDeleter,
 )

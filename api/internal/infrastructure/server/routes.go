@@ -26,6 +26,8 @@ func NewRoutes(
 	translateMessageHandler *handlers.TranslateMessage,
 	uploadImageHandler *handlers.UploadImage,
 	getAllChatsHandler *handlers.GetAllChats,
+	wsHandler *handlers.WS,
+	deleteChatHandler *handlers.DeleteChat,
 ) []Route {
 	return []Route{
 		{
@@ -77,6 +79,12 @@ func NewRoutes(
 			Handler: connectToChatHandler.Handle,
 		},
 		{
+			Name:    "delete_chat",
+			Method:  http.MethodDelete,
+			Path:    "/chat/:id",
+			Handler: deleteChatHandler.Handle,
+		},
+		{
 			Name:    "send_message",
 			Method:  http.MethodPost,
 			Path:    "/message",
@@ -93,6 +101,12 @@ func NewRoutes(
 			Method:  http.MethodPost,
 			Path:    "/image/upload",
 			Handler: uploadImageHandler.Handle,
+		},
+		{
+			Name:    "get_ws",
+			Method:  http.MethodGet,
+			Path:    "/ws",
+			Handler: wsHandler.Handle,
 		},
 	}
 }

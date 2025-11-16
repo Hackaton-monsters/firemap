@@ -33,3 +33,16 @@ func (r *chatUserRepository) Add(chatUser entity.ChatUser) (entity.ChatUser, err
 	}
 	return chatUser, nil
 }
+
+func (r *chatUserRepository) DeleteByID(userID, chatID int64) error {
+	tx := r.db.Delete(&entity.ChatUser{}, "user_id = ? AND chat_id = ?", userID, chatID)
+	if tx.Error != nil {
+		return tx.Error
+	}
+
+	if tx.RowsAffected == 0 {
+		return service.ErrUserNotPresentInChat
+	}
+
+	return nil
+}

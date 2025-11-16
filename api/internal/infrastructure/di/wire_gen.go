@@ -62,7 +62,10 @@ func InitializeProcessManager() *ProcessManager {
 	uploadImage := handlers.NewUploadImage(imageUploader)
 	chatGetter := usecase.NewChatGetter(userService, markerService, chatService, imageService)
 	getAllChats := handlers.NewGetAllChats(chatGetter)
-	v := server.NewRoutes(login, register, authMe, createMarker, getMarkers, getChatHistory, sendMessage, connectToChat, translateMessage, uploadImage, getAllChats)
+	ws := handlers.NewWS(hub)
+	chatDeleter := usecase.NewChatDeleter(userService, chatUserService)
+	deleteChat := handlers.NewDeleteChat(chatDeleter)
+	v := server.NewRoutes(login, register, authMe, createMarker, getMarkers, getChatHistory, sendMessage, connectToChat, translateMessage, uploadImage, getAllChats, ws, deleteChat)
 	processManager := NewProcessManager(configConfig, sqlDB, v, hub)
 	return processManager
 }

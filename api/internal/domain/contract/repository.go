@@ -42,4 +42,5 @@ type ImageRepository interface {
 
 type ChatUserRepository interface {
 	Add(chatUser entity.ChatUser) (entity.ChatUser, error)
+	DeleteByID(userID, chatID int64) error
 }
