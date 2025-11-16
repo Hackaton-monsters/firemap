@@ -49,63 +49,65 @@ func (u *markerCreator) CreateMarker(token string, cmd *command.CreateMarker) (*
 		return nil, err
 	}
 
-	// 1. Пытаемся найти существующий маркер в радиусе 500 м
-	existingMarker, found, err := u.markerService.FindNearestWithinRadius(cmd.Lat, cmd.Lon, mergeRadiusMeters)
-	if err != nil {
-		return nil, err
-	}
-
-	// ===== ВЕТКА 1: маркер уже есть рядом =====
-	if found {
-		// Создаём новый report, но НЕ создаём новый marker/chat
-		report, err := u.reportService.Create(*cmd, existingMarker.ID)
+	// ===== Пытаемся объединять ТОЛЬКО если создаём "fire" =====
+	if cmd.Type == "fire" {
+		existingMarker, found, err := u.markerService.FindNearestWithinRadius(cmd.Lat, cmd.Lon, mergeRadiusMeters)
 		if err != nil {
 			return nil, err
 		}
 
-		// Подключаем юзера к чату маркера (может уже быть в чате)
-		_, err = u.chatUserService.Connect(user.ID, existingMarker.ChatID)
-		if err != nil && !errors.Is(err, service.ErrUserAlreadyPresentInChat) {
-			return nil, err
-		}
-
-		// Фотки → URL
-		photoURLs := make([]string, 0, len(report.Photos))
-		for _, photoID := range report.Photos {
-			image, err := u.imageService.GetByID(photoID)
+		// объединяем только если рядом есть маркер и он тоже типа "fire"
+		if found && existingMarker.Type == "fire" {
+			// создаём только новый report
+			report, err := u.reportService.Create(*cmd, existingMarker.ID)
 			if err != nil {
-				continue
+				return nil, err
 			}
-			photoURLs = append(photoURLs, image.URL)
+
+			// подключаем юзера к чату этого маркера (может уже быть в чате)
+			_, err = u.chatUserService.Connect(user.ID, existingMarker.ChatID)
+			if err != nil && !errors.Is(err, service.ErrUserAlreadyPresentInChat) {
+				return nil, err
+			}
+
+			photoURLs := make([]string, 0, len(report.Photos))
+			for _, photoID := range report.Photos {
+				image, err := u.imageService.GetByID(photoID)
+				if err != nil {
+					continue
+				}
+				photoURLs = append(photoURLs, image.URL)
+			}
+
+			// считаем, что к существующим репортам добавился ещё один
+			reportsCount := len(existingMarker.Reports) + 1
+
+			markerResponse := &response.Marker{
+				ID:     existingMarker.ID,
+				ChatID: existingMarker.ChatID,
+				Lat:    existingMarker.Lat,
+				Lon:    existingMarker.Lon,
+				Reports: []response.Report{{
+					ID:      report.ID,
+					Comment: report.Comment,
+					Photos:  photoURLs,
+				}},
+				ReportsCount: reportsCount,
+				Type:         existingMarker.Type,
+				Title:        existingMarker.Title,
+			}
+
+			return &response.CreatedMarker{
+				Marker:   *markerResponse,
+				IsNew:    false, // ← ВАЖНО: НЕ новый маркер, мы присоединились к существующему
+				IsMember: true,
+			}, nil
 		}
-
-		// В БД у existingMarker уже есть existingMarker.Reports,
-		// мы только что добавили ещё один report
-		reportsCount := len(existingMarker.Reports) + 1
-
-		markerResponse := &response.Marker{
-			ID:     existingMarker.ID,
-			ChatID: existingMarker.ChatID,
-			Lat:    existingMarker.Lat,
-			Lon:    existingMarker.Lon,
-			Reports: []response.Report{{
-				ID:      report.ID,
-				Comment: report.Comment,
-				Photos:  photoURLs,
-			}},
-			ReportsCount: reportsCount,
-			Type:         existingMarker.Type,
-			Title:        existingMarker.Title,
-		}
-
-		return &response.CreatedMarker{
-			Marker:   *markerResponse,
-			IsNew:    false, // ← главное отличие
-			IsMember: true,
-		}, nil
 	}
 
-	// ===== ВЕТКА 2: поблизости нет маркеров — создаём новый чат + маркер =====
+	// ===== сюда попадаем если:
+	// - type != "fire", или
+	// - type == "fire", но рядом нет fire-маркера =====
 
 	chat, err := u.chatService.Create()
 	if err != nil {
