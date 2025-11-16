@@ -39,3 +39,7 @@ type ImageRepository interface {
 	Save(image entity.Image) (entity.Image, error)
 	GetByID(ID int64) (entity.Image, error)
 }
+
+type ChatUserRepository interface {
+	Add(chatUser entity.ChatUser) (entity.ChatUser, error)
+}

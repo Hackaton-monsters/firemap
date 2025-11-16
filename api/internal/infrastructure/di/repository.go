@@ -13,4 +13,5 @@ var repositorySet = wire.NewSet(
 	repository.NewMarkerRepository,
 	repository.NewMessagesRepository,
 	repository.NewImageRepository,
+	repository.NewChatUserRepository,
 )

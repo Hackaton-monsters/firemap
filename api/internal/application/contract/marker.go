@@ -6,7 +6,7 @@ import (
 )
 
 type MarkerCreator interface {
-	CreateMarker(token string, command *command.CreateMarker) (*response.Marker, error)
+	CreateMarker(token string, command *command.CreateMarker) (*response.CreatedMarker, error)
 }
 
 type MarkerGetter interface {

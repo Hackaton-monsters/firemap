@@ -12,4 +12,5 @@ var serviceSet = wire.NewSet(
 	service.NewReportService,
 	service.NewChatService,
 	service.NewImageService,
+	service.NewChatUserService,
 )

@@ -9,6 +9,7 @@ package di
 import (
 	"firemap/internal/application/service"
 	"firemap/internal/application/usecase"
+	"firemap/internal/infrastructure/chat"
 	"firemap/internal/infrastructure/config"
 	"firemap/internal/infrastructure/db"
 	"firemap/internal/infrastructure/repository"
@@ -16,6 +17,7 @@ import (
 	"firemap/internal/infrastructure/server"
 	"firemap/internal/infrastructure/server/handlers"
 	"firemap/internal/infrastructure/translator"
+	"github.com/google/wire"
 )
 
 // Injectors from wire.go:
@@ -43,16 +45,31 @@ func InitializeProcessManager() *ProcessManager {
 	imageRepository := repository.NewImageRepository(gormDB, cloudinaryClient, configConfig)
 	imageService := service.NewImageService(imageRepository)
 	markerCreator := usecase.NewMarkerCreator(userService, markerService, reportService, chatService, imageService)
+	chatUserRepository := repository.NewChatUserRepository(gormDB)
+	chatUserService := service.NewChatUserService(chatUserRepository)
+	markerCreator := usecase.NewMarkerCreator(userService, markerService, reportService, chatService, chatUserService)
 	createMarker := handlers.NewCreateMarker(markerCreator)
 	markerGetter := usecase.NewMarkersGetter(userService, markerService, imageService)
 	getMarkers := handlers.NewGetMarkers(markerGetter)
 	chatHistoryGetter := usecase.NewChatHistoryGetter(userService, markerService, chatService)
 	getChatHistory := handlers.NewGetChatHistory(chatHistoryGetter)
+	hub := chat.NewHub(messageRepository, userRepository, chatRepository)
+	sendMessage := handlers.NewSendMessage(hub)
+	chatConnector := usecase.NewChatConnector(userService, chatService, markerService, chatUserService)
+	connectToChat := handlers.NewConnectToChat(chatConnector)
 	translatorTranslator := translator.NewClient(configConfig)
 	translateMessage := handlers.NewTranslateMessage(messageRepository, translatorTranslator)
+	chatGetter := usecase.NewChatGetter(userService, markerService, chatService)
+	getAllChats := handlers.NewGetAllChats(chatGetter)
+	v := server.NewRoutes(login, register, authMe, createMarker, getMarkers, getChatHistory, sendMessage, connectToChat, translateMessage, getAllChats)
+	processManager := NewProcessManager(configConfig, sqlDB, v, hub)
 	imageUploader := usecase.NewImageUploader(imageService, userService)
 	uploadImage := handlers.NewUploadImage(imageUploader)
 	v := server.NewRoutes(login, register, authMe, createMarker, getMarkers, getChatHistory, translateMessage, uploadImage)
 	processManager := NewProcessManager(configConfig, sqlDB, v)
 	return processManager
 }
+
+// wire.go:
+
+var chatSet = wire.NewSet(chat.NewHub)

@@ -46,6 +46,7 @@ func (u *chatHistoryGetter) GetChatHistory(token string, chatID int64) (*respons
 				Email:    message.User.Email,
 				Role:     message.User.Role,
 			},
+			CreatedAt: message.CreatedAt,
 		})
 	}
 
