@@ -5,8 +5,9 @@ type Markers struct {
 }
 
 type CreatedMarker struct {
-	Marker Marker `json:"marker"`
-	IsNew  bool   `json:"isNew"`
+	Marker   Marker `json:"marker"`
+	IsNew    bool   `json:"isNew"`
+	IsMember bool   `json:"isMember"`
 }
 
 type MapMarker struct {
