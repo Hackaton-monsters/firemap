@@ -8,7 +8,7 @@ import (
 )
 
 type MarkerService interface {
-	Create(marker command.CreateMarker, chatID int64) (entity.Marker, error)
+	Create(marker command.CreateMarker, chatID int64, title string) (entity.Marker, error)
 	GetAll() ([]entity.Marker, error)
 	GetByChatId(chatID int64) (entity.Marker, error)
 }
@@ -23,13 +23,13 @@ func NewMarkerService(repository contract.MarkerRepository) MarkerService {
 	}
 }
 
-func (s *markerService) Create(marker command.CreateMarker, chatID int64) (entity.Marker, error) {
+func (s *markerService) Create(marker command.CreateMarker, chatID int64, title string) (entity.Marker, error) {
 	return s.repository.Add(entity.Marker{
 		ChatID: chatID,
 		Lat:    marker.Lat,
 		Lon:    marker.Lon,
 		Type:   marker.Type,
-		Title:  "test",
+		Title:  title,
 	})
 }
 

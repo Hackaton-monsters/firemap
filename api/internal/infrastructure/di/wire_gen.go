@@ -12,6 +12,7 @@ import (
 	"firemap/internal/infrastructure/chat"
 	"firemap/internal/infrastructure/config"
 	"firemap/internal/infrastructure/db"
+	"firemap/internal/infrastructure/geo_ip"
 	"firemap/internal/infrastructure/repository"
 	"firemap/internal/infrastructure/s3"
 	"firemap/internal/infrastructure/server"
@@ -46,7 +47,8 @@ func InitializeProcessManager() *ProcessManager {
 	cloudinaryClient := s3.ProvideS3Client(configConfig)
 	imageRepository := repository.NewImageRepository(gormDB, cloudinaryClient, configConfig)
 	imageService := service.NewImageService(imageRepository)
-	markerCreator := usecase.NewMarkerCreator(userService, markerService, reportService, chatService, chatUserService, imageService)
+	infoGetter := geo_ip.NewClient(configConfig)
+	markerCreator := usecase.NewMarkerCreator(userService, markerService, reportService, chatService, chatUserService, imageService, infoGetter)
 	createMarker := handlers.NewCreateMarker(markerCreator)
 	markerGetter := usecase.NewMarkersGetter(userService, markerService, imageService)
 	getMarkers := handlers.NewGetMarkers(markerGetter)

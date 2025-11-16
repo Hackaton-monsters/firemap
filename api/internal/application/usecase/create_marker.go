@@ -1,10 +1,13 @@
 package usecase
 
 import (
+	"context"
 	"firemap/internal/application/command"
 	"firemap/internal/application/contract"
 	"firemap/internal/application/response"
 	"firemap/internal/application/service"
+	"firemap/internal/infrastructure/geo_ip"
+	"fmt"
 )
 
 type markerCreator struct {
@@ -14,6 +17,7 @@ type markerCreator struct {
 	chatService     service.ChatService
 	chatUserService service.ChatUserService
 	imageService    service.ImageService
+	infoGetter      geo_ip.InfoGetter
 }
 
 func NewMarkerCreator(
@@ -23,6 +27,7 @@ func NewMarkerCreator(
 	chatService service.ChatService,
 	chatUserService service.ChatUserService,
 	imageService service.ImageService,
+	infoGetter geo_ip.InfoGetter,
 ) contract.MarkerCreator {
 	return &markerCreator{
 		userService:     userService,
@@ -31,6 +36,7 @@ func NewMarkerCreator(
 		chatService:     chatService,
 		chatUserService: chatUserService,
 		imageService:    imageService,
+		infoGetter:      infoGetter,
 	}
 }
 
@@ -45,7 +51,15 @@ func (u *markerCreator) CreateMarker(token string, command *command.CreateMarker
 		return nil, err
 	}
 
-	marker, err := u.markerService.Create(*command, chat.ID)
+	title, err := u.infoGetter.GetDisplayNameByCoordinate(context.TODO(), command.Lat, command.Lon)
+	if err != nil {
+		fmt.Println(err)
+		title = fmt.Sprintf("%f %f", command.Lat, command.Lon)
+	}
+
+	title = fmt.Sprintf("%s - %s", command.Type, title)
+
+	marker, err := u.markerService.Create(*command, chat.ID, title)
 	if err != nil {
 		return nil, err
 	}
