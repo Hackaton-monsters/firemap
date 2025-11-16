@@ -57,15 +57,26 @@ func (u *chatGetter) GetAllChats(token string) (*response.Chats, error) {
 			messages = append(messages, message)
 		}
 
+		reportsResponse := make([]response.Report, 0)
+		for _, report := range marker.Reports {
+			reportsResponse = append(reportsResponse, response.Report{
+				ID:      report.ID,
+				Comment: report.Comment,
+				Photos:  report.Photos,
+			})
+		}
+
 		responseChat := response.Chat{
 			ID: chat.ID,
 			Marker: response.Marker{
-				ID:     marker.ID,
-				ChatID: marker.ChatID,
-				Lat:    marker.Lat,
-				Lon:    marker.Lon,
-				Type:   marker.Type,
-				Title:  marker.Title,
+				ID:           marker.ID,
+				ChatID:       marker.ChatID,
+				Lat:          marker.Lat,
+				Lon:          marker.Lon,
+				Type:         marker.Type,
+				Title:        marker.Title,
+				Reports:      reportsResponse,
+				ReportsCount: len(reportsResponse),
 			},
 			Messages: messages,
 		}
