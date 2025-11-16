@@ -3,7 +3,7 @@ package response
 import "time"
 
 type CreatedMessage struct {
-	ChatID  int64   `json:"chat_id"`
+	ChatID  int64   `json:"chatId"`
 	Message Message `json:"message"`
 }
 
