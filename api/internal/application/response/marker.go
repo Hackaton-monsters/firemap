@@ -1,12 +1,18 @@
 package response
 
 type Markers struct {
-	Markers []*Marker `json:"markers"`
+	Markers []*MapMarker `json:"markers"`
 }
 
 type CreatedMarker struct {
-	Marker Marker `json:"marker"`
-	IsNew  bool   `json:"isNew"`
+	Marker   Marker `json:"marker"`
+	IsNew    bool   `json:"isNew"`
+	IsMember bool   `json:"isMember"`
+}
+
+type MapMarker struct {
+	Marker
+	IsMember bool `json:"isMember"`
 }
 
 type Marker struct {

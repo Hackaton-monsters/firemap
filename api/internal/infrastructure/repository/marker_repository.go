@@ -52,6 +52,7 @@ func (r *markerRepository) GetByChatID(chatId int64) (entity.Marker, error) {
 	var marker entity.Marker
 
 	err := r.db.
+		Preload("Reports").
 		Preload("Chat.Messages").
 		Preload("Chat.Messages.User").
 		Where("chat_id = ?", chatId).

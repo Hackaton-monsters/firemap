@@ -8,10 +8,11 @@ import (
 )
 
 type markerCreator struct {
-	userService   service.UserService
-	markerService service.MarkerService
-	reportService service.ReportService
-	chatService   service.ChatService
+	userService     service.UserService
+	markerService   service.MarkerService
+	reportService   service.ReportService
+	chatService     service.ChatService
+	chatUserService service.ChatUserService
 }
 
 func NewMarkerCreator(
@@ -19,17 +20,19 @@ func NewMarkerCreator(
 	markerService service.MarkerService,
 	reportService service.ReportService,
 	chatService service.ChatService,
+	chatUserService service.ChatUserService,
 ) contract.MarkerCreator {
 	return &markerCreator{
-		userService:   userService,
-		markerService: markerService,
-		reportService: reportService,
-		chatService:   chatService,
+		userService:     userService,
+		markerService:   markerService,
+		reportService:   reportService,
+		chatService:     chatService,
+		chatUserService: chatUserService,
 	}
 }
 
 func (u *markerCreator) CreateMarker(token string, command *command.CreateMarker) (*response.CreatedMarker, error) {
-	_, err := u.userService.FindByToken(token)
+	user, err := u.userService.FindByToken(token)
 	if err != nil {
 		return nil, err
 	}
@@ -45,6 +48,11 @@ func (u *markerCreator) CreateMarker(token string, command *command.CreateMarker
 	}
 
 	report, err := u.reportService.Create(*command, marker.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = u.chatUserService.Connect(user.ID, chat.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +73,8 @@ func (u *markerCreator) CreateMarker(token string, command *command.CreateMarker
 	}
 
 	return &response.CreatedMarker{
-		Marker: markerResponse,
-		IsNew:  true,
+		Marker:   markerResponse,
+		IsNew:    true,
+		IsMember: true,
 	}, nil
 }

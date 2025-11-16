@@ -22,14 +22,14 @@ func NewMarkersGetter(
 }
 
 func (u *markersGetter) GetMarkers(token string) (*response.Markers, error) {
-	_, err := u.userService.FindByToken(token)
+	user, err := u.userService.FindByToken(token)
 	if err != nil {
 		return nil, err
 	}
 
 	markers, _ := u.markerService.GetAll()
 
-	var markersResponse []*response.Marker
+	var markersResponse []*response.MapMarker
 	for _, marker := range markers {
 		reportsResponse := make([]response.Report, 0)
 		for _, report := range marker.Reports {
@@ -40,15 +40,27 @@ func (u *markersGetter) GetMarkers(token string) (*response.Markers, error) {
 			})
 		}
 
-		markersResponse = append(markersResponse, &response.Marker{
-			ID:           marker.ID,
-			ChatID:       marker.ChatID,
-			Lat:          marker.Lat,
-			Lon:          marker.Lon,
-			Reports:      reportsResponse,
-			ReportsCount: len(marker.Reports),
-			Type:         marker.Type,
-			Title:        marker.Title,
+		IsMember := false
+
+		for _, userChat := range user.Chats {
+			if userChat.ID == marker.ChatID {
+				IsMember = true
+				break
+			}
+		}
+
+		markersResponse = append(markersResponse, &response.MapMarker{
+			Marker: response.Marker{
+				ID:           marker.ID,
+				ChatID:       marker.ChatID,
+				Lat:          marker.Lat,
+				Lon:          marker.Lon,
+				Reports:      reportsResponse,
+				ReportsCount: len(marker.Reports),
+				Type:         marker.Type,
+				Title:        marker.Title,
+			},
+			IsMember: IsMember,
 		})
 	}
 
