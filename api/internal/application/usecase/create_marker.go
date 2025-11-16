@@ -56,6 +56,9 @@ func (u *markerCreator) CreateMarker(token string, command *command.CreateMarker
 		fmt.Println(err)
 		title = fmt.Sprintf("%f %f", command.Lat, command.Lon)
 	}
+	if title == "" {
+		title = fmt.Sprintf("%f %f", command.Lat, command.Lon)
+	}
 
 	title = fmt.Sprintf("%s - %s", command.Type, title)
 

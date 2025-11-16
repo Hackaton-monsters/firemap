@@ -18,6 +18,7 @@ type LocationIQResponse struct {
 
 	Address struct {
 		Road        string `json:"road"`
+		Name        string `json:"name"`
 		HouseNumber string `json:"house_number"`
 		Suburb      string `json:"suburb"`
 		County      string `json:"county"`
@@ -120,5 +121,5 @@ func (c *Client) GetDisplayNameByCoordinate(ctx context.Context, lat, lon float6
 		return "", fmt.Errorf("decode json: %w", err)
 	}
 
-	return liq.Address.County, nil
+	return liq.Address.Name, nil
 }
