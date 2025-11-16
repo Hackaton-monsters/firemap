@@ -25,6 +25,7 @@ func NewRoutes(
 	connectToChatHandler *handlers.ConnectToChat,
 	translateMessageHandler *handlers.TranslateMessage,
 	getAllChatsHandler *handlers.GetAllChats,
+	wsHandler *handlers.WS,
 ) []Route {
 	return []Route{
 		{
@@ -86,6 +87,12 @@ func NewRoutes(
 			Method:  http.MethodGet,
 			Path:    "/message/:id/translate/",
 			Handler: translateMessageHandler.Handle,
+		},
+		{
+			Name:    "get_ws",
+			Method:  http.MethodGet,
+			Path:    "/ws",
+			Handler: wsHandler.Handle,
 		},
 	}
 }
