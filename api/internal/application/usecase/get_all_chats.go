@@ -4,7 +4,6 @@ import (
 	"firemap/internal/application/contract"
 	"firemap/internal/application/response"
 	"firemap/internal/application/service"
-	"fmt"
 )
 
 type chatGetter struct {
@@ -31,19 +30,31 @@ func (u *chatGetter) GetAllChats(token string) (*response.Chats, error) {
 		return nil, err
 	}
 
-	fmt.Println(user.Email)
-	fmt.Println(user.Email)
-	fmt.Println(len(user.Chats))
-	fmt.Println(len(user.Chats))
-	fmt.Println(len(user.Chats))
-	fmt.Println(len(user.Chats))
-
 	responseChats := make([]response.Chat, 0)
 
 	for _, chat := range user.Chats {
 		marker, err := u.markerService.GetByChatId(chat.ID)
 		if err != nil {
 			return nil, err
+		}
+
+		messages := make([]response.Message, 0)
+
+		if len(marker.Chat.Messages) > 0 {
+			lastMessageI := len(marker.Chat.Messages) - 1
+
+			message := response.Message{
+				ID:   marker.Chat.Messages[lastMessageI].ID,
+				Text: marker.Chat.Messages[lastMessageI].Text,
+				User: response.User{
+					ID:       marker.Chat.Messages[lastMessageI].User.ID,
+					Nickname: marker.Chat.Messages[lastMessageI].User.Nickname,
+					Email:    marker.Chat.Messages[lastMessageI].User.Email,
+					Role:     marker.Chat.Messages[lastMessageI].User.Role,
+				},
+				CreatedAt: marker.Chat.Messages[lastMessageI].CreatedAt,
+			}
+			messages = append(messages, message)
 		}
 
 		responseChat := response.Chat{
@@ -56,6 +67,7 @@ func (u *chatGetter) GetAllChats(token string) (*response.Chats, error) {
 				Type:   marker.Type,
 				Title:  marker.Title,
 			},
+			Messages: messages,
 		}
 
 		responseChats = append(responseChats, responseChat)
