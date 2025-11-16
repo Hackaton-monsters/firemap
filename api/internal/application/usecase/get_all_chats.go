@@ -90,13 +90,40 @@ func (u *chatGetter) GetAllChats(token string) (*response.Chats, error) {
 				Reports:      reportsResponse,
 				ReportsCount: len(reportsResponse),
 			},
-			Messages: messages,
+			Messages:  messages,
+			CreatedAt: chat.CreatedAt,
 		}
 
 		responseChats = append(responseChats, responseChat)
 	}
 
-	return &response.Chats{
+	chats := response.Chats{
 		Chats: responseChats,
-	}, err
+	}
+
+	chats.SortByLastActivityDesc()
+
+	return &chats, err
+}
+
+func sortChatsByLatestMessage(chats []response.Chat) []response.Chat {
+	sortedChats := make([]response.Chat, len(chats))
+	copy(sortedChats, chats)
+
+	for i := 0; i < len(sortedChats)-1; i++ {
+		for j := 0; j < len(sortedChats)-i-1; j++ {
+			var timeJ, timeJ1 int64
+			if len(sortedChats[j].Messages) > 0 {
+				timeJ = sortedChats[j].Messages[0].CreatedAt.Unix()
+			}
+			if len(sortedChats[j+1].Messages) > 0 {
+				timeJ1 = sortedChats[j+1].Messages[0].CreatedAt.Unix()
+			}
+			if timeJ < timeJ1 {
+				sortedChats[j], sortedChats[j+1] = sortedChats[j+1], sortedChats[j]
+			}
+		}
+	}
+
+	return sortedChats
 }
