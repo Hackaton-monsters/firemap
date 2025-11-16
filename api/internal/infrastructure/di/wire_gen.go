@@ -12,6 +12,7 @@ import (
 	"firemap/internal/infrastructure/config"
 	"firemap/internal/infrastructure/db"
 	"firemap/internal/infrastructure/repository"
+	"firemap/internal/infrastructure/s3"
 	"firemap/internal/infrastructure/server"
 	"firemap/internal/infrastructure/server/handlers"
 	"firemap/internal/infrastructure/translator"
@@ -38,15 +39,20 @@ func InitializeProcessManager() *ProcessManager {
 	chatRepository := repository.NewChatRepository(gormDB)
 	messageRepository := repository.NewMessagesRepository(gormDB)
 	chatService := service.NewChatService(chatRepository, messageRepository)
-	markerCreator := usecase.NewMarkerCreator(userService, markerService, reportService, chatService)
+	cloudinaryClient := s3.ProvideS3Client(configConfig)
+	imageRepository := repository.NewImageRepository(gormDB, cloudinaryClient, configConfig)
+	imageService := service.NewImageService(imageRepository)
+	markerCreator := usecase.NewMarkerCreator(userService, markerService, reportService, chatService, imageService)
 	createMarker := handlers.NewCreateMarker(markerCreator)
-	markerGetter := usecase.NewMarkersGetter(userService, markerService)
+	markerGetter := usecase.NewMarkersGetter(userService, markerService, imageService)
 	getMarkers := handlers.NewGetMarkers(markerGetter)
 	chatHistoryGetter := usecase.NewChatHistoryGetter(userService, markerService, chatService)
 	getChatHistory := handlers.NewGetChatHistory(chatHistoryGetter)
 	translatorTranslator := translator.NewClient(configConfig)
 	translateMessage := handlers.NewTranslateMessage(messageRepository, translatorTranslator)
-	v := server.NewRoutes(login, register, authMe, createMarker, getMarkers, getChatHistory, translateMessage)
+	imageUploader := usecase.NewImageUploader(imageService, userService)
+	uploadImage := handlers.NewUploadImage(imageUploader)
+	v := server.NewRoutes(login, register, authMe, createMarker, getMarkers, getChatHistory, translateMessage, uploadImage)
 	processManager := NewProcessManager(configConfig, sqlDB, v)
 	return processManager
 }

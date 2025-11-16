@@ -1,6 +1,9 @@
 package contract
 
-import "firemap/internal/domain/entity"
+import (
+	"firemap/internal/domain/entity"
+	"mime/multipart"
+)
 
 type ChatRepository interface {
 	Add(chat entity.Chat) (entity.Chat, error)
@@ -28,4 +31,11 @@ type MarkerRepository interface {
 
 type ReportRepository interface {
 	Add(report entity.Report) (entity.Report, error)
+}
+
+type ImageRepository interface {
+	UploadImage(file multipart.File, filename string) (string, error)
+	DeleteImage(imageKey string) error
+	Save(image entity.Image) (entity.Image, error)
+	GetByID(ID int64) (entity.Image, error)
 }
