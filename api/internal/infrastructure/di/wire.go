@@ -7,6 +7,7 @@ import (
 	"firemap/internal/infrastructure/chat"
 	"firemap/internal/infrastructure/config"
 	"firemap/internal/infrastructure/db"
+	"firemap/internal/infrastructure/geo_ip"
 	"firemap/internal/infrastructure/s3"
 	"firemap/internal/infrastructure/server"
 	"firemap/internal/infrastructure/translator"
@@ -25,6 +26,7 @@ func InitializeProcessManager() *ProcessManager {
 		db.NewDBForMigrations,
 		config.LoadFromEnvironment,
 		s3.ProvideS3Client,
+		geo_ip.NewClient,
 		server.NewRoutes,
 		translator.NewClient,
 		chatSet,

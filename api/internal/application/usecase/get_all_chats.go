@@ -90,13 +90,18 @@ func (u *chatGetter) GetAllChats(token string) (*response.Chats, error) {
 				Reports:      reportsResponse,
 				ReportsCount: len(reportsResponse),
 			},
-			Messages: messages,
+			Messages:  messages,
+			CreatedAt: chat.CreatedAt,
 		}
 
 		responseChats = append(responseChats, responseChat)
 	}
 
-	return &response.Chats{
+	chats := response.Chats{
 		Chats: responseChats,
-	}, err
+	}
+
+	chats.SortByLastActivityDesc()
+
+	return &chats, err
 }

@@ -16,6 +16,12 @@ type Config struct {
 	HttpServerPort  int        `envconfig:"HTTP_SERVER_PORT" default:"8081"`
 	Translator      Translator `envconfig:"translator"`
 	S3              S3         `envconfig:"s3"`
+	GeoIP           GeoIP      `envconfig:"geoIP"`
+}
+
+type GeoIP struct {
+	GeoIPUrl string `envconfig:"GEO_IP_URL"`
+	GeoIPKey string `envconfig:"GEO_IP_KEY"`
 }
 
 type Translator struct {
