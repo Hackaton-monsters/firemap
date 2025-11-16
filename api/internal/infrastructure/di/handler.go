@@ -16,4 +16,5 @@ var handlerSet = wire.NewSet(
 	handlers.NewTranslateMessage,
 	handlers.NewSendMessage,
 	handlers.NewConnectToChat,
+	handlers.NewGetAllChats,
 )

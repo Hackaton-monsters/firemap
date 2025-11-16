@@ -13,6 +13,10 @@ type Message struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
+type Chats struct {
+	Chats []Chat `json:"chats"`
+}
+
 type Chat struct {
 	ID       int64     `json:"id"`
 	Marker   Marker    `json:"marker"`
