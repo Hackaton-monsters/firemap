@@ -1,7 +1,12 @@
 package chat
 
 import (
+	"context"
+	"encoding/json"
+	"firemap/internal/application/command"
+	"firemap/internal/application/response"
 	"firemap/internal/domain/contract"
+	"firemap/internal/domain/entity"
 )
 
 type subscription struct {
@@ -15,7 +20,9 @@ type messageEvent struct {
 }
 
 type Hub struct {
-	repository contract.MessageRepository
+	messageRepository contract.MessageRepository
+	userRepository    contract.UserRepository
+	chatRepository    contract.ChatRepository
 
 	register   chan *Client
 	unregister chan *Client
@@ -30,17 +37,23 @@ type Hub struct {
 	rooms   map[int64]map[*Client]bool
 }
 
-func NewHub(repository contract.MessageRepository) *Hub {
+func NewHub(
+	messageRepository contract.MessageRepository,
+	userRepository contract.UserRepository,
+	chatRepository contract.ChatRepository,
+) *Hub {
 	return &Hub{
-		repository:  repository,
-		register:    make(chan *Client),
-		unregister:  make(chan *Client),
-		subscribe:   make(chan subscription),
-		unsubscribe: make(chan subscription),
-		broadcast:   make(chan messageEvent),
-		chatEvents:  make(chan []byte),
-		clients:     make(map[*Client]bool),
-		rooms:       make(map[int64]map[*Client]bool),
+		messageRepository: messageRepository,
+		userRepository:    userRepository,
+		chatRepository:    chatRepository,
+		register:          make(chan *Client),
+		unregister:        make(chan *Client),
+		subscribe:         make(chan subscription),
+		unsubscribe:       make(chan subscription),
+		broadcast:         make(chan messageEvent),
+		chatEvents:        make(chan []byte),
+		clients:           make(map[*Client]bool),
+		rooms:             make(map[int64]map[*Client]bool),
 	}
 }
 
@@ -129,9 +142,63 @@ func (h *Hub) Unsubscribe(c *Client, chatID int64) {
 	h.unsubscribe <- subscription{client: c, chatID: chatID}
 }
 
+func (h *Hub) CreateAndBroadcastMessage(ctx context.Context, token string, command command.SendMessage) (*response.CreatedMessage, error) {
+	user, err := h.userRepository.FindByToken(token)
+	if err != nil {
+		return nil, err
+	}
+
+	if _, err = h.chatRepository.GetById(command.ChatID); err != nil {
+		return nil, err
+	}
+
+	messageEntity := entity.Message{
+		ChatID: command.ChatID,
+		UserID: user.ID,
+		Text:   command.Text,
+	}
+
+	message, err := h.messageRepository.Add(messageEntity)
+	if err != nil {
+		return nil, err
+	}
+
+	messageResponse := response.Message{
+		ID:   message.ID,
+		Text: message.Text,
+		User: response.User{
+			ID:       message.User.ID,
+			Nickname: message.User.Nickname,
+			Email:    message.User.Email,
+			Role:     message.User.Role,
+		},
+		CreatedAt: message.CreatedAt,
+	}
+
+	payload, err := json.Marshal(struct {
+		Type    string           `json:"type"`
+		Payload response.Message `json:"payload"`
+	}{
+		Type:    "message",
+		Payload: messageResponse,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	h.broadcast <- messageEvent{
+		chatID: command.ChatID,
+		data:   payload,
+	}
+
+	return &response.CreatedMessage{
+		Message: messageResponse,
+	}, nil
+}
+
 //func (h *Hub) HandleIncomingMessage(chatID int64, text string) error {
-//	msg, err := h.repository.Add(...)
-//	msg, err := h.repository.CreateMessage(context.Background(), chatID, nil, text)
+//	msg, err := h.messageRepository.Add(...)
+//	msg, err := h.messageRepository.CreateMessage(context.Background(), chatID, nil, text)
 //	if err != nil {
 //		return err
 //	}
@@ -153,10 +220,10 @@ func (h *Hub) Unsubscribe(c *Client, chatID int64) {
 //	}
 //	return nil
 //}
-//
+
 //// История по запросу клиента (по WS)
 //func (h *Hub) SendHistory(c *Client, chatID int64, limit int) error {
-//	msgs, err := h.repository.GetMessages(context.Background(), chatID, limit)
+//	msgs, err := h.messageRepository.GetMessages(context.Background(), chatID, limit)
 //	if err != nil {
 //		return err
 //	}

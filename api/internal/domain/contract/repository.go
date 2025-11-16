@@ -29,3 +29,7 @@ type MarkerRepository interface {
 type ReportRepository interface {
 	Add(report entity.Report) (entity.Report, error)
 }
+
+type ChatUserRepository interface {
+	Add(chatUser entity.ChatUser) (entity.ChatUser, error)
+}

@@ -3,6 +3,7 @@ package di
 import (
 	"database/sql"
 	"embed"
+	"firemap/internal/infrastructure/chat"
 	"firemap/internal/infrastructure/config"
 	"firemap/internal/infrastructure/server"
 	"fmt"
@@ -17,17 +18,20 @@ type ProcessManager struct {
 	config *config.Config
 	db     *sql.DB
 	routes []server.Route
+	hub    *chat.Hub
 }
 
 func NewProcessManager(
 	config *config.Config,
 	db *sql.DB,
 	routes []server.Route,
+	hub *chat.Hub,
 ) *ProcessManager {
 	return &ProcessManager{
 		config: config,
 		db:     db,
 		routes: routes,
+		hub:    hub,
 	}
 }
 
@@ -50,8 +54,8 @@ func (pm *ProcessManager) Migrate() {
 }
 
 func (pm *ProcessManager) RunHTTPServer() {
+	go pm.hub.Run()
 	router := gin.Default()
-
 	for _, route := range pm.routes {
 		switch route.Method {
 		case http.MethodGet:

@@ -4,6 +4,7 @@
 package di
 
 import (
+	"firemap/internal/infrastructure/chat"
 	"firemap/internal/infrastructure/config"
 	"firemap/internal/infrastructure/db"
 	"firemap/internal/infrastructure/server"
@@ -24,6 +25,11 @@ func InitializeProcessManager() *ProcessManager {
 		config.LoadFromEnvironment,
 		server.NewRoutes,
 		translator.NewClient,
+		chatSet,
 	)
 	return &ProcessManager{}
 }
+
+var chatSet = wire.NewSet(
+	chat.NewHub,
+)

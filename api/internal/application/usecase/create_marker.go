@@ -28,7 +28,7 @@ func NewMarkerCreator(
 	}
 }
 
-func (u *markerCreator) CreateMarker(token string, command *command.CreateMarker) (*response.Marker, error) {
+func (u *markerCreator) CreateMarker(token string, command *command.CreateMarker) (*response.CreatedMarker, error) {
 	_, err := u.userService.FindByToken(token)
 	if err != nil {
 		return nil, err
@@ -49,7 +49,7 @@ func (u *markerCreator) CreateMarker(token string, command *command.CreateMarker
 		return nil, err
 	}
 
-	markerResponse := &response.Marker{
+	markerResponse := response.Marker{
 		ID:     marker.ID,
 		ChatID: marker.ChatID,
 		Lat:    marker.Lat,
@@ -64,5 +64,8 @@ func (u *markerCreator) CreateMarker(token string, command *command.CreateMarker
 		Title:        marker.Title,
 	}
 
-	return markerResponse, nil
+	return &response.CreatedMarker{
+		Marker: markerResponse,
+		IsNew:  true,
+	}, nil
 }

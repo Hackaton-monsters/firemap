@@ -9,12 +9,14 @@ package di
 import (
 	"firemap/internal/application/service"
 	"firemap/internal/application/usecase"
+	"firemap/internal/infrastructure/chat"
 	"firemap/internal/infrastructure/config"
 	"firemap/internal/infrastructure/db"
 	"firemap/internal/infrastructure/repository"
 	"firemap/internal/infrastructure/server"
 	"firemap/internal/infrastructure/server/handlers"
 	"firemap/internal/infrastructure/translator"
+	"github.com/google/wire"
 )
 
 // Injectors from wire.go:
@@ -44,9 +46,21 @@ func InitializeProcessManager() *ProcessManager {
 	getMarkers := handlers.NewGetMarkers(markerGetter)
 	chatHistoryGetter := usecase.NewChatHistoryGetter(userService, markerService, chatService)
 	getChatHistory := handlers.NewGetChatHistory(chatHistoryGetter)
+	hub := chat.NewHub(messageRepository, userRepository, chatRepository)
+	sendMessage := handlers.NewSendMessage(hub)
+	chatUserRepository := repository.NewChatUserRepository(gormDB)
+	chatUserService := service.NewChatUserService(chatUserRepository)
+	chatConnector := usecase.NewChatConnector(userService, chatService, markerService, chatUserService)
+	connectToChat := handlers.NewConnectToChat(chatConnector)
 	translatorTranslator := translator.NewClient(configConfig)
 	translateMessage := handlers.NewTranslateMessage(messageRepository, translatorTranslator)
-	v := server.NewRoutes(login, register, authMe, createMarker, getMarkers, getChatHistory, translateMessage)
-	processManager := NewProcessManager(configConfig, sqlDB, v)
+	chatGetter := usecase.NewChatGetter(userService, markerService, chatService)
+	getAllChats := handlers.NewGetAllChats(chatGetter)
+	v := server.NewRoutes(login, register, authMe, createMarker, getMarkers, getChatHistory, sendMessage, connectToChat, translateMessage, getAllChats)
+	processManager := NewProcessManager(configConfig, sqlDB, v, hub)
 	return processManager
 }
+
+// wire.go:
+
+var chatSet = wire.NewSet(chat.NewHub)

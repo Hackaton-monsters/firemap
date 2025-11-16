@@ -4,6 +4,11 @@ type Markers struct {
 	Markers []*Marker `json:"markers"`
 }
 
+type CreatedMarker struct {
+	Marker Marker `json:"marker"`
+	IsNew  bool   `json:"isNew"`
+}
+
 type Marker struct {
 	ID           int64    `json:"id"`
 	ChatID       int64    `json:"chatId"`
